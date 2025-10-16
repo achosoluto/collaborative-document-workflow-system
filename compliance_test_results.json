@@ -1,0 +1,84 @@
+{
+  "total_tests": 11,
+  "passed_tests": 11,
+  "failed_tests": 0,
+  "test_details": [
+    {
+      "test_name": "data_models",
+      "passed": true,
+      "message": "Data models created and serialized successfully",
+      "details": "",
+      "timestamp": "2025-10-15T19:47:36.986130"
+    },
+    {
+      "test_name": "data_manager",
+      "passed": true,
+      "message": "Data manager operations successful",
+      "details": "",
+      "timestamp": "2025-10-15T19:47:36.987252"
+    },
+    {
+      "test_name": "compliance_scanner",
+      "passed": true,
+      "message": "Scanner initialized and tested successfully",
+      "details": "",
+      "timestamp": "2025-10-15T19:47:36.988354"
+    },
+    {
+      "test_name": "compliance_tracker",
+      "passed": true,
+      "message": "Tracker operations successful",
+      "details": "",
+      "timestamp": "2025-10-15T19:47:36.988415"
+    },
+    {
+      "test_name": "dashboard",
+      "passed": true,
+      "message": "Dashboard data generation successful",
+      "details": "",
+      "timestamp": "2025-10-15T19:47:36.989511"
+    },
+    {
+      "test_name": "reporting",
+      "passed": true,
+      "message": "Reporting system operational",
+      "details": "",
+      "timestamp": "2025-10-15T19:47:36.989935"
+    },
+    {
+      "test_name": "workflows",
+      "passed": true,
+      "message": "Workflow system operational",
+      "details": "",
+      "timestamp": "2025-10-15T19:47:36.990005"
+    },
+    {
+      "test_name": "analytics",
+      "passed": true,
+      "message": "Analytics system operational",
+      "details": "",
+      "timestamp": "2025-10-15T19:47:36.990836"
+    },
+    {
+      "test_name": "integration",
+      "passed": true,
+      "message": "Integration points working correctly",
+      "details": "",
+      "timestamp": "2025-10-15T19:47:36.991029"
+    },
+    {
+      "test_name": "end_to_end_workflow",
+      "passed": true,
+      "message": "End-to-end workflow completed",
+      "details": "",
+      "timestamp": "2025-10-15T19:47:36.992040"
+    },
+    {
+      "test_name": "performance",
+      "passed": true,
+      "message": "Performance test passed in 0.00s",
+      "details": "",
+      "timestamp": "2025-10-15T19:47:36.993221"
+    }
+  ]
+}

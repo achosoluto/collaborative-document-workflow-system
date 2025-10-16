@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliance Monitoring Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card.critical { border-left: 4px solid #dc3545; }
+        .stat-card.high { border-left: 4px solid #fd7e14; }
+        .stat-card.medium { border-left: 4px solid #ffc107; }
+        .stat-card.low { border-left: 4px solid #28a745; }
+        .stat-card.info { border-left: 4px solid #17a2b8; }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card.critical .stat-value { color: #dc3545; }
+        .stat-card.high .stat-value { color: #fd7e14; }
+        .stat-card.medium .stat-value { color: #ffc107; }
+        .stat-card.low .stat-value { color: #28a745; }
+        .stat-card.info .stat-value { color: #17a2b8; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .chart-container h3 {
+            margin-bottom: 1rem;
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .activity-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-meta {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .activity-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .badge-compliant { background: #d4edda; color: #155724; }
+        .badge-non-compliant { background: #f8d7da; color: #721c24; }
+        .badge-partial { background: #fff3cd; color: #856404; }
+        .badge-critical { background: #dc3545; color: white; }
+        .badge-high { background: #fd7e14; color: white; }
+        .badge-medium { background: #ffc107; color: #212529; }
+        .badge-low { background: #28a745; color: white; }
+
+        .deadlines-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .deadline-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .deadline-item:last-child {
+            border-bottom: none;
+        }
+
+        .deadline-content {
+            flex: 1;
+        }
+
+        .deadline-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .deadline-date {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .deadline-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .refresh-indicator {
+            text-align: center;
+            margin: 1rem 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 Compliance Monitoring Dashboard</h1>
+        <div class="subtitle">Real-time compliance status and violation tracking</div>
+    </div>
+
+    <div class="container">
+        <div id="loading" class="loading">Loading dashboard data...</div>
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="dashboard-content" style="display: none;">
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card info">
+                    <div class="stat-value" id="total-documents">0</div>
+                    <div class="stat-label">Total Documents</div>
+                </div>
+                <div class="stat-card" id="compliance-rate-card">
+                    <div class="stat-value" id="compliance-rate">0%</div>
+                    <div class="stat-label">Compliance Rate</div>
+                </div>
+                <div class="stat-card critical">
+                    <div class="stat-value" id="critical-violations">0</div>
+                    <div class="stat-label">Critical Violations</div>
+                </div>
+                <div class="stat-card high">
+                    <div class="stat-value" id="open-violations">0</div>
+                    <div class="stat-label">Open Violations</div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Compliance Trends Chart -->
+                <div class="chart-container">
+                    <h3>📈 Compliance Trends (Last 30 Days)</h3>
+                    <canvas id="trends-chart" width="400" height="200"></canvas>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="activity-list">
+                    <h3 style="padding: 1.5rem 1.5rem 0; margin: 0; color: #333;">🕐 Recent Assessments</h3>
+                    <div id="recent-assessments">
+                        <!-- Recent assessments will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secondary Grid -->
+            <div class="dashboard-grid">
+                <!-- Active Violations -->
+                <div class="activity-list">
+                    <h3 style="padding: 1.5rem 1.5rem 0; margin: 0; color: #333;">⚠️ Active Violations</h3>
+                    <div id="active-violations">
+                        <!-- Active violations will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Upcoming Deadlines -->
+                <div class="deadlines-list">
+                    <h3 style="padding: 1.5rem 1.5rem 0; margin: 0; color: #333;">⏰ Upcoming Deadlines</h3>
+                    <div id="upcoming-deadlines">
+                        <!-- Deadlines will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Refresh Indicator -->
+        <div class="refresh-indicator">
+            Last updated: <span id="last-updated">Never</span> |
+            Next refresh in: <span id="refresh-countdown">30</span>s
+        </div>
+    </div>
+
+    <script>
+        let refreshTimer;
+        let countdownTimer;
+        let refreshInterval = 30; // seconds
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            startRefreshTimer();
+        });
+
+        async function loadDashboardData() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('dashboard-content').style.display = 'none';
+                document.getElementById('error').style.display = 'none';
+
+                const response = await fetch('/api/compliance/dashboard');
+                const data = await response.json();
+
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+
+                updateDashboard(data);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard-content').style.display = 'block';
+
+            } catch (error) {
+                showError('Failed to load dashboard data: ' + error.message);
+            }
+        }
+
+        function updateDashboard(data) {
+            // Update statistics
+            const stats = data.overall_statistics;
+            document.getElementById('total-documents').textContent = stats.total_documents || 0;
+            document.getElementById('compliance-rate').textContent = stats.compliance_rate + '%';
+
+            // Update compliance rate card color
+            const rateCard = document.getElementById('compliance-rate-card');
+            rateCard.className = 'stat-card';
+            if (stats.compliance_rate >= 90) rateCard.classList.add('low');
+            else if (stats.compliance_rate >= 70) rateCard.classList.add('medium');
+            else if (stats.compliance_rate >= 50) rateCard.classList.add('high');
+            else rateCard.classList.add('critical');
+
+            document.getElementById('critical-violations').textContent = stats.critical_violations || 0;
+            document.getElementById('open-violations').textContent = stats.open_violations || 0;
+
+            // Update recent assessments
+            updateRecentAssessments(data.recent_assessments);
+
+            // Update active violations
+            updateActiveViolations(data.active_violations);
+
+            // Update compliance trends chart
+            updateTrendsChart(data.compliance_trends);
+
+            // Update upcoming deadlines
+            updateUpcomingDeadlines(data.upcoming_deadlines);
+
+            // Update last updated time
+            document.getElementById('last-updated').textContent = new Date(data.last_updated).toLocaleString();
+        }
+
+        function updateRecentAssessments(assessments) {
+            const container = document.getElementById('recent-assessments');
+
+            if (!assessments || assessments.length === 0) {
+                container.innerHTML = '<div class="activity-item"><div class="activity-content">No recent assessments</div></div>';
+                return;
+            }
+
+            container.innerHTML = assessments.map(assessment => `
+                <div class="activity-item">
+                    <div class="activity-content">
+                        <div class="activity-title">${assessment.doc_title}</div>
+                        <div class="activity-meta">
+                            Score: ${assessment.compliance_score}% |
+                            Status: ${assessment.overall_status} |
+                            ${new Date(assessment.assessed_at).toLocaleDateString()}
+                        </div>
+                    </div>
+                    <div class="activity-badge badge-${assessment.overall_status.replace('_', '-')}">
+                        ${assessment.overall_status}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateActiveViolations(violations) {
+            const container = document.getElementById('active-violations');
+
+            if (!violations || violations.length === 0) {
+                container.innerHTML = '<div class="activity-item"><div class="activity-content">No active violations</div></div>';
+                return;
+            }
+
+            container.innerHTML = violations.slice(0, 10).map(violation => `
+                <div class="activity-item">
+                    <div class="activity-content">
+                        <div class="activity-title">${violation.title}</div>
+                        <div class="activity-meta">
+                            ${violation.doc_title} | ${violation.days_open} days open
+                        </div>
+                    </div>
+                    <div class="activity-badge badge-${violation.severity}">
+                        ${violation.severity}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateTrendsChart(trendsData) {
+            const ctx = document.getElementById('trends-chart').getContext('2d');
+
+            // Destroy existing chart if it exists
+            if (window.trendsChart) {
+                window.trendsChart.destroy();
+            }
+
+            if (!trendsData.daily_scores || trendsData.daily_scores.length === 0) {
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#666';
+                ctx.textAlign = 'center';
+                ctx.fillText('No trend data available', ctx.canvas.width/2, ctx.canvas.height/2);
+                return;
+            }
+
+            window.trendsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: trendsData.daily_scores.map(d => new Date(d.date).toLocaleDateString()),
+                    datasets: [{
+                        label: 'Compliance Score',
+                        data: trendsData.daily_scores.map(d => d.average_score),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Compliance Score (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateUpcomingDeadlines(deadlines) {
+            const container = document.getElementById('upcoming-deadlines');
+
+            if (!deadlines || deadlines.length === 0) {
+                container.innerHTML = '<div class="deadline-item"><div class="deadline-content">No upcoming deadlines</div></div>';
+                return;
+            }
+
+            container.innerHTML = deadlines.slice(0, 5).map(deadline => `
+                <div class="deadline-item">
+                    <div class="deadline-content">
+                        <div class="deadline-title">${deadline.requirement_title}</div>
+                        <div class="deadline-date">
+                            Expires: ${new Date(deadline.expiry_date).toLocaleDateString()} (${deadline.days_until_expiry} days)
+                        </div>
+                    </div>
+                    <div class="deadline-badge badge-${deadline.severity}">
+                        ${deadline.severity}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboard-content').style.display = 'none';
+            document.getElementById('error').textContent = message;
+            document.getElementById('error').style.display = 'block';
+        }
+
+        function startRefreshTimer() {
+            let countdown = refreshInterval;
+
+            countdownTimer = setInterval(() => {
+                document.getElementById('refresh-countdown').textContent = countdown;
+                countdown--;
+
+                if (countdown < 0) {
+                    countdown = refreshInterval;
+                }
+            }, 1000);
+
+            refreshTimer = setInterval(() => {
+                loadDashboardData();
+            }, refreshInterval * 1000);
+        }
+
+        // Cleanup timers on page unload
+        window.addEventListener('beforeunload', function() {
+            if (refreshTimer) clearInterval(refreshTimer);
+            if (countdownTimer) clearInterval(countdownTimer);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+# Core dependencies for the Advanced Document Search Engine
+
+# Web framework
+Flask>=2.0.0
+
+# Document processing
+PyPDF2>=3.0.0
+python-docx>=0.8.11
+pandas>=1.5.0
+beautifulsoup4>=4.11.0
+lxml>=4.9.0
+openpyxl>=3.1.0
+python-pptx>=0.6.21
+
+# Natural language processing and AI
+nltk>=3.8
+sentence-transformers>=2.2.0
+transformers>=4.21.0
+torch>=2.0.0
+tokenizers>=0.13.0
+spacy>=3.6.0
+
+# Advanced text processing and summarization
+sumy>=0.11.0
+rouge-score>=0.1.2
+bert-extractive-summarizer>=0.10.1
+networkx>=3.1
+textstat>=0.7.0
+
+# Vector search and similarity
+faiss-cpu>=1.7.0
+numpy>=1.21.0
+scikit-learn>=1.1.0
+
+# Visualization and dashboard
+plotly>=5.15.0
+dash>=2.11.0
+
+# Export and reporting
+reportlab>=4.0.0
+jinja2>=3.1.0
+
+# Utilities
+python-dateutil>=2.8.0
+pathlib>=1.0.1
+tqdm>=4.65.0
+
+# Real-time collaboration (WebSocket support)
+websockets>=11.0.0
+asyncio-mqtt>=0.16.0
+python-socketio>=5.8.0
+
+# Additional collaborative features
+pytz>=2023.3
+python-multipart>=0.0.6

@@ -1,0 +1,94 @@
+# Sensitive and confidential files
+document_catalog.json
+document_metadata.json
+.env
+*.log
+config.json
+secrets.json
+
+# System files
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache/
+.pytest_cache/
+.hypothesis
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Data and cache directories
+data/
+temp/
+tmp/
+cache/
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration files that may contain sensitive info
+*.key
+*.pem
+*.crt
+*.p12
+
+# Documentation with potentially sensitive content
+# (Keep the collaborative system documentation but exclude governance docs)
+**/SCM_Governance_*.md
+**/DTP_docs/
+**/Houston_DTPs/
+**/Approved_For_Use/
+**/*.pdf
+**/*.docx
+**/*.xlsx
+
+# Keep collaborative system files
+!**/collaborative_workflow.py
+!**/collaborative_editor.py
+!**/annotation_system.py
+!**/notification_system.py
+!**/workflow_automation.py
+!**/collaborative_dashboard.py
+!**/websocket_manager.py
+!**/collaborative_integration.py
+!**/collaborative_web_interface.py
+!**/COLLABORATIVE_WORKFLOW_README.md
+!**/COLLABORATIVE_WORKFLOW_RESOURCE_REPORT.md
+
+# Test files
+tests/
+test_*
+*_test.py
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
